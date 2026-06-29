@@ -1,0 +1,18 @@
+export const cityRushHourProfiles = {
+  London: { peak: 30000, shoulder: 14000 },
+  Manchester: { peak: 24000, shoulder: 10000 },
+  Birmingham: { peak: 22000, shoulder: 9000 },
+  Glasgow: { peak: 19000, shoulder: 8000 },
+  Liverpool: { peak: 18000, shoulder: 7500 },
+  Leeds: { peak: 18000, shoulder: 7500 },
+  Sheffield: { peak: 16000, shoulder: 6500 },
+  Edinburgh: { peak: 16000, shoulder: 6500 },
+  Cardiff: { peak: 15000, shoulder: 6000 },
+  Newcastle: { peak: 14500, shoulder: 6000 },
+  Nottingham: { peak: 14000, shoulder: 5500 },
+  Leicester: { peak: 13000, shoulder: 5000 },
+  Southampton: { peak: 12000, shoulder: 4500 },
+  Wolverhampton: { peak: 12000, shoulder: 4500 },
+  Sunderland: { peak: 10000, shoulder: 4000 },
+  Belfast: { peak: 13000, shoulder: 5000 },
+};

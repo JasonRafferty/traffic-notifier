@@ -73,10 +73,13 @@ traffic-notifier/
 ├── index.html              # Single-page app shell
 ├── src/
 │   ├── js/
-│   │   ├── main.js         # Entry point — handles search, fetches both APIs
-│   │   ├── displayEvents.js # Renders event list, filters by time window
-│   │   ├── venues.js       # Hardcoded venue ID → capacity + type map
-│   │   └── timeUtils.js    # Converts HH:MM strings to minutes for comparison
+│   │   ├── app.js          # Entry point — coordinates controls, fetches, scoring, rendering
+│   │   ├── api/            # Ticketmaster and TheSportsDB fetchers
+│   │   ├── data/           # City, venue, alias, and rush-hour profile data
+│   │   ├── events/         # Event normalisation, deduping, and time-window logic
+│   │   ├── traffic/        # Baseline traffic and verdict scoring
+│   │   ├── ui/             # Controls, loading, verdict, and event renderers
+│   │   └── utils/          # Shared time helpers
 │   └── styles/
 │       └── style.css
 └── package.json
@@ -84,7 +87,7 @@ traffic-notifier/
 
 ### Key Design Decisions
 
-**venues.js** — Ticketmaster uses internal venue IDs (e.g. `KovZ9177z3V` = Old Trafford). The venues map translates these to human-readable names, capacities, and sport types. This is used both for display and for estimating event duration when the API doesn't provide an end time:
+**data/venueCapacities.js** — Ticketmaster uses internal venue IDs (e.g. `KovZ9177z3V` = Old Trafford). The venues map translates these to human-readable names, capacities, and sport types. This is used both for display and for estimating event duration when the API doesn't provide an end time:
 
 | Sport type | Estimated duration |
 |---|---|
@@ -93,7 +96,7 @@ traffic-notifier/
 | Hockey | 2.5 hours |
 | Music / Theatre / Other | 3 hours |
 
-**Sorting by capacity** — events are ranked largest-first because the biggest venues cause the most traffic impact. The app caps results at the top 5 by default (adjustable via `venuesShown` in `displayEvents.js`).
+**Sorting by capacity** — events are ranked largest-first because the biggest venues cause the most traffic impact. The app caps results at the top 5 by default (adjustable via `venuesShown` in `app.js`).
 
 **Time window filtering** — if you enter a time, only events whose window (start − 1hr) to (end + 1hr) overlaps your chosen time are shown. The ±1hr buffer accounts for crowds arriving early and dispersing late.
 
@@ -112,7 +115,7 @@ traffic-notifier/
 - Free tier (API v1) — no key required
 - Returns upcoming fixtures for a given team ID
 - Docs: https://www.thesportsdb.com/docs_api_examples
-- Currently hardcoded to Arsenal (ID: 133604) — city → club mapping is a planned improvement
+- City-to-club mappings live in `src/js/data/footballClubs.js`
 
 ---
 
@@ -125,13 +128,21 @@ npm install
 npm run dev
 ```
 
-> Note: the Ticketmaster API key is currently hardcoded in `main.js`. For a shared or public deployment this should be moved to an environment variable or a proxy backend.
+Create a local `.env` file from `.env.example` and set:
+
+```bash
+VITE_TICKETMASTER_API_KEY=your_ticketmaster_api_key_here
+```
+
+> Note: Vite exposes `VITE_` variables to the browser bundle. This is fine for public browser keys, but a private key should be protected behind a proxy backend.
 
 ## Deployment
 
 Pushes to `main` automatically build and deploy the app to GitHub Pages through `.github/workflows/deploy.yml`.
 
 In the GitHub repo settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. After the first successful run, the app will be available from the GitHub Pages URL for this repository.
+
+Set a GitHub Actions repository secret named `VITE_TICKETMASTER_API_KEY` so the Pages build includes Ticketmaster support.
 
 ---
 
@@ -147,4 +158,4 @@ The app has hardcoded capacity data for major UK venues across:
 
 **Northern Ireland:** Belfast
 
-Venues without a matching entry in `venues.js` will still appear in results but will show "Unknown" capacity and fall back to a 3-hour duration estimate.
+Venues without a matching entry in `data/venueCapacities.js` will still appear in results but will show "Unknown" capacity and fall back to a 3-hour duration estimate.

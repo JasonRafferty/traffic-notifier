@@ -1,0 +1,18 @@
+export const footballClubIdsByCity = {
+  Manchester: ["133612", "133613"],
+  London: ["133604", "133610", "133616", "133636", "133632", "133600", "133851"],
+  Birmingham: ["133601", "133597"],
+  Liverpool: ["133602", "133615"],
+  Newcastle: ["134777"],
+  Leeds: ["133635"],
+  Sheffield: ["133811", "133837"],
+  Nottingham: ["133720"],
+  Leicester: ["133626"],
+  Southampton: ["134778"],
+  Wolverhampton: ["133599"],
+  Sunderland: ["133603"],
+  Glasgow: ["133647", "133642"],
+  Edinburgh: ["133643", "133646"],
+  Cardiff: ["133637"],
+  Belfast: ["133964"],
+};
