@@ -33,6 +33,25 @@ input[type="time"] {
   100% { background-position: center, 0 0, 0 0, 0%   50%; }
 }
 
+/* Quick-select chip buttons */
+.chip {
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+  border: 1px solid #1E2D45;
+  background: #0A0F1C;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgb(148 163 184);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+  white-space: nowrap;
+}
+.chip:hover, .chip.active {
+  border-color: rgb(100 116 139);
+  background: #151F35;
+  color: white;
+}
+
 /* Fade + slide up for results */
 .fade-in {
   animation: fadeSlideIn 0.35s ease forwards;

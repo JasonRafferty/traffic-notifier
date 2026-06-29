@@ -118,15 +118,20 @@ traffic-notifier/
 
 ## Running Locally
 
-This is a vanilla JS ES module app with no build step. Open `index.html` directly in a browser, or serve it with any static file server:
+This is a Vite app. Install dependencies and start the dev server:
 
 ```bash
-npx serve .
-# or
-python3 -m http.server
+npm install
+npm run dev
 ```
 
 > Note: the Ticketmaster API key is currently hardcoded in `main.js`. For a shared or public deployment this should be moved to an environment variable or a proxy backend.
+
+## Deployment
+
+Pushes to `main` automatically build and deploy the app to GitHub Pages through `.github/workflows/deploy.yml`.
+
+In the GitHub repo settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. After the first successful run, the app will be available from the GitHub Pages URL for this repository.
 
 ---
 

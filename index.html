@@ -56,19 +56,35 @@
             </div>
           </div>
 
-          <!-- Date and time -->
-          <div class="flex gap-3">
+          <!-- Date -->
+          <div class="space-y-2">
             <input
               type="date"
               id="dateInput"
-              class="flex-1 bg-[#0A0F1C] border border-[#1E2D45] text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-slate-500 transition-colors"
+              class="w-full bg-[#0A0F1C] border border-[#1E2D45] text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-slate-500 transition-colors"
             />
+            <div class="flex gap-1.5">
+              <button class="chip date-chip" data-key="today">Today</button>
+              <button class="chip date-chip" data-key="tomorrow">Tomorrow</button>
+              <button class="chip date-chip" data-key="sat">Sat</button>
+              <button class="chip date-chip" data-key="sun">Sun</button>
+            </div>
+          </div>
+
+          <!-- Time -->
+          <div class="flex items-center gap-3">
             <input
               type="time"
               id="timeInput"
-              class="w-36 bg-[#0A0F1C] border border-[#1E2D45] text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-slate-500 transition-colors"
+              class="w-36 shrink-0 bg-[#0A0F1C] border border-[#1E2D45] text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-slate-500 transition-colors"
               aria-label="Filter by time (optional)"
             />
+            <div class="flex gap-1.5 flex-wrap">
+              <button class="chip time-chip" data-time="" title="No time filter">Any</button>
+              <button class="chip time-chip" data-time="09:00" title="Morning – 9:00 AM">AM</button>
+              <button class="chip time-chip" data-time="14:00" title="Afternoon – 2:00 PM">PM</button>
+              <button class="chip time-chip" data-time="19:00" title="Evening – 7:00 PM">Eve</button>
+            </div>
           </div>
 
           <!-- Search button -->
