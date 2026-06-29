@@ -1,11 +1,54 @@
 import { venueCapacities } from "./venues.js";
 import { parseTimeString } from "./timeUtils.js";
 
+function renderVerdict(events) {
+  const verdictEl = document.getElementById("verdict");
+  if (!verdictEl) return;
+
+  if (!events || events.length === 0) {
+    verdictEl.innerHTML = `<div class="verdict verdict-green"><span class="verdict-icon">✓</span><span class="verdict-text">No major events today — roads should be clear</span></div>`;
+    return;
+  }
+
+  const totalCapacity = events.reduce((sum, event) => {
+    const venueId = event._embedded?.venues?.[0]?.id;
+    return sum + (venueCapacities[venueId]?.capacity || 0);
+  }, 0);
+
+  let level, icon, message;
+  if (totalCapacity >= 60000) {
+    level = "red";
+    icon = "✕";
+    message = "High traffic risk — avoid driving if possible";
+  } else if (totalCapacity >= 20000) {
+    level = "amber";
+    icon = "⚠";
+    message = "Some disruption likely — consider your timing";
+  } else {
+    level = "green";
+    icon = "✓";
+    message = "Low traffic risk — roads should be clear";
+  }
+
+  const crowdText = totalCapacity > 0
+    ? `${events.length} event${events.length > 1 ? "s" : ""} today · ~${totalCapacity.toLocaleString()} people expected`
+    : `${events.length} event${events.length > 1 ? "s" : ""} today`;
+
+  verdictEl.innerHTML = `
+    <div class="verdict verdict-${level}">
+      <span class="verdict-icon">${icon}</span>
+      <span class="verdict-text">${message}</span>
+      <span class="verdict-sub">${crowdText}</span>
+    </div>`;
+}
+
 export function displayEvents(events, userTimeInMins) {
   const venuesShown = 5; //This is how many venues shown, adjust if debug needed
 
   const eventsContainer = document.getElementById("events");
   eventsContainer.innerHTML = "";
+
+  renderVerdict(events);
 
   if (!events || events.length === 0) {
     eventsContainer.innerHTML = "<p>No events found for that date.</p>";

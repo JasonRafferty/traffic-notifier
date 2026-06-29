@@ -12,19 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
   dateInput.value = today;
 
   // Attach listeners
-  //Search by button click
   document
     .getElementById("inputButton")
     .addEventListener("click", handleSearchButton);
-
-  //Search by enter
-  document
-    .getElementById("inputSearchBar")
-    .addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        handleSearchButton();
-      }
-    });
 });
 
 // ========== 2. HELPER FUNCTIONS ==========
@@ -48,9 +38,9 @@ function handleSearchButton() {
 // ========== 3. TICKETMASTER FETCH ==========
 
 async function fetchTicketmasterEvents() {
-  const city = document.getElementById("inputSearchBar").value.trim();
+  const city = document.getElementById("citySelect").value;
   if (!city) {
-    alert("Please enter a city name.");
+    alert("Please select a city.");
     return;
   }
 

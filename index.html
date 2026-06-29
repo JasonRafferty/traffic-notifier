@@ -10,14 +10,26 @@
     <div class="mainContainer">
       <h1>Traffic Notifier</h1>
 
-      <!-- Location Input -->
-      <input
-        class="inputSearchBar"
-        id="inputSearchBar"
-        type="text"
-        placeholder="Enter Location"
-        aria-label="Location Input"
-      />
+      <!-- City Dropdown -->
+      <select class="inputSearchBar" id="citySelect" aria-label="Select City">
+        <option value="" disabled selected>Select a city</option>
+        <option value="Manchester">Manchester</option>
+        <option value="London">London</option>
+        <option value="Birmingham">Birmingham</option>
+        <option value="Liverpool">Liverpool</option>
+        <option value="Newcastle">Newcastle</option>
+        <option value="Leeds">Leeds</option>
+        <option value="Sheffield">Sheffield</option>
+        <option value="Nottingham">Nottingham</option>
+        <option value="Leicester">Leicester</option>
+        <option value="Southampton">Southampton</option>
+        <option value="Wolverhampton">Wolverhampton</option>
+        <option value="Sunderland">Sunderland</option>
+        <option value="Glasgow">Glasgow</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="Cardiff">Cardiff</option>
+        <option value="Belfast">Belfast</option>
+      </select>
 
       <!-- Search Button -->
       <button class="inputButton" id="inputButton">Search</button>
@@ -36,6 +48,9 @@
         placeholder="HH:MM"
         aria-label="Select a Time"
       />
+
+      <!-- Traffic Verdict -->
+      <div id="verdict"></div>
 
       <h3>Upcoming Major Events</h3>
       <div id="events"></div>

@@ -93,6 +93,63 @@ button.inputButton:active {
   background: transparent;
 }
 
+/* City dropdown */
+select.inputSearchBar {
+  appearance: none;
+  cursor: pointer;
+  padding: 4px 12px;
+}
+
+select.inputSearchBar option {
+  background-color: #fff;
+  color: #000;
+}
+
+/* Traffic verdict banner */
+.verdict {
+  width: 90%;
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin: 10px 0 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: 2px solid transparent;
+}
+
+.verdict-green {
+  background-color: rgba(34, 197, 94, 0.25);
+  border-color: rgba(34, 197, 94, 0.6);
+}
+
+.verdict-amber {
+  background-color: rgba(234, 179, 8, 0.25);
+  border-color: rgba(234, 179, 8, 0.6);
+}
+
+.verdict-red {
+  background-color: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.verdict-icon {
+  font-size: 18pt;
+  font-weight: bold;
+}
+
+.verdict-text {
+  font-size: 10pt;
+  font-weight: bold;
+  text-align: center;
+}
+
+.verdict-sub {
+  font-size: 8pt;
+  opacity: 0.75;
+  text-align: center;
+}
+
 /* making mobile compatibility*/
 @media (max-width: 600px) {
   .mainContainer {
