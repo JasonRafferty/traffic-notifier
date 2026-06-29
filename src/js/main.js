@@ -1,6 +1,6 @@
 // Import local modules
 import { venueCapacities } from "./venues.js";
-import { displayEvents } from "./displayEvents.js";
+import { displayEvents, showLoading } from "./displayEvents.js";
 import { parseTimeString } from "./timeUtils.js";
 
 const footballClubIdsByCity = {
@@ -80,22 +80,33 @@ document.addEventListener("DOMContentLoaded", () => {
   syncDateChips();
 
   // Time chips
-  function syncTimeChips() {
+  function setActiveTimeChip(activeBtn) {
+    document.querySelectorAll(".time-chip").forEach(b => b.classList.remove("active"));
+    if (activeBtn) activeBtn.classList.add("active");
+  }
+
+  function syncTimeChipsToValue() {
     const current = timeInput.value;
-    document.querySelectorAll(".time-chip").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.time === current);
-    });
+    const match = [...document.querySelectorAll(".time-chip")].find(
+      b => b.dataset.time !== "now" && b.dataset.time === current
+    );
+    setActiveTimeChip(match || null);
   }
 
   document.querySelectorAll(".time-chip").forEach(btn => {
     btn.addEventListener("click", () => {
-      timeInput.value = btn.dataset.time;
-      syncTimeChips();
+      if (btn.dataset.time === "now") {
+        const now = new Date();
+        timeInput.value = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      } else {
+        timeInput.value = btn.dataset.time;
+      }
+      setActiveTimeChip(btn);
     });
   });
 
-  timeInput.addEventListener("change", syncTimeChips);
-  syncTimeChips();
+  timeInput.addEventListener("change", syncTimeChipsToValue);
+  syncTimeChipsToValue();
 
   // Attach listeners
   document
@@ -130,12 +141,14 @@ async function handleSearchButton() {
 
   const userTimeInMins = getUserTimeInMins();
 
+  showLoading();
+
   const [ticketmasterEvents, footballMatches] = await Promise.all([
     fetchTicketmasterEvents(city, dateInput),
     fetchFootballMatches(city, dateInput),
   ]);
 
-  displayEvents(dedupeEvents([...ticketmasterEvents, ...footballMatches]), userTimeInMins);
+  displayEvents(dedupeEvents([...ticketmasterEvents, ...footballMatches]), userTimeInMins, dateInput, city);
 }
 
 function normaliseVenueName(name) {
