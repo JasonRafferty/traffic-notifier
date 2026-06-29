@@ -37,17 +37,20 @@ function renderVerdict(events) {
     ? `${count} event${count !== 1 ? "s" : ""} · ~${totalCapacity.toLocaleString()} people expected`
     : "";
 
-  const dot = (colour, hex, glowHex, active) => `
-    <div class="w-3 h-3 rounded-full transition-all duration-300"
-      style="background:${hex};${active ? `box-shadow:0 0 10px 3px ${glowHex};` : "opacity:0.15;"}">
+  const dot = (hex, glowHex, active) => `
+    <div class="relative w-3 h-3 shrink-0">
+      ${active ? `<div class="absolute inset-0 rounded-full animate-ping opacity-40" style="background:${glowHex}"></div>` : ""}
+      <div class="relative w-3 h-3 rounded-full transition-all duration-300"
+        style="background:${hex};${active ? `box-shadow:0 0 10px 3px ${glowHex};` : "opacity:0.15;"}">
+      </div>
     </div>`;
 
   verdictEl.innerHTML = `
-    <div class="flex items-center gap-4 rounded-xl border border-[#1E2D45] bg-[#0A0F1C] px-5 py-4">
+    <div class="fade-in flex items-center gap-4 rounded-xl border border-[#1E2D45] bg-[#0A0F1C] px-5 py-4">
       <div class="flex flex-col gap-1.5 shrink-0">
-        ${dot("red",   "#EF4444", "#EF4444", level === "red")}
-        ${dot("amber", "#EAB308", "#EAB308", level === "amber")}
-        ${dot("green", "#22C55E", "#22C55E", level === "green")}
+        ${dot("#EF4444", "#EF4444", level === "red")}
+        ${dot("#EAB308", "#EAB308", level === "amber")}
+        ${dot("#22C55E", "#22C55E", level === "green")}
       </div>
       <div>
         <p class="font-display font-bold text-2xl text-white uppercase tracking-wide leading-none">${headline}</p>
@@ -63,7 +66,12 @@ export function displayEvents(events, userTimeInMins) {
   const eventsSection = document.getElementById("events-section");
 
   renderVerdict(events);
-  eventsSection?.classList.remove("hidden");
+  if (eventsSection) {
+    eventsSection.classList.remove("hidden");
+    eventsSection.classList.remove("fade-in");
+    void eventsSection.offsetWidth; // force reflow so animation replays
+    eventsSection.classList.add("fade-in");
+  }
 
   eventsContainer.innerHTML = "";
 
