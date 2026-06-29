@@ -17,7 +17,7 @@ export const venueCapacities = {
   KovZ9177z6L: { capacity: 60260, location: "Emirates Stadium" },
   KovZ9177z1y: { capacity: 41500, location: "Stamford Bridge" },
   KovZ9177z7g: { capacity: 25000, location: "The O2 Arena" },
-  KovZ9177z8p: { capacity: 25000, location: "The Valley" },
+  KovZ91778pf: { capacity: 27111, location: "The Valley" },
   KovZ9177z4X: { capacity: 40000, location: "Craven Cottage" },
   KovZ9177z5X: { capacity: 30500, location: "Selhurst Park" },
   KovZ9177gU0: { capacity: 1400,  location: "Palace Theatre" },
@@ -76,6 +76,8 @@ export const venueCapacities = {
 
   // Edinburgh
   KovZ9177z9E: { capacity: 67800, location: "Murrayfield Stadium" },
+  KovZ9177PeV: { capacity: 19852, location: "Tynecastle Park" },
+  KovZ9177wlf: { capacity: 20421, location: "Easter Road Stadium" },
 
   // Nottingham
   KovZ9177z3b: { capacity: 30445, location: "City Ground" },
@@ -94,4 +96,5 @@ export const venueCapacities = {
 
   // Belfast
   KovZ9177zNI: { capacity: 32000, location: "Kingspan Stadium" },
+  KovZ917AAv0: { capacity: 18434, location: "National Stadium at Windsor Park" },
 };

@@ -10,6 +10,8 @@ export const homeGrounds = {
   "West Ham United":          "KovZ9177z6g",
   "Crystal Palace":           "KovZ9177z5X",
   "Fulham":                   "KovZ9177z4X",
+  "Charlton Athletic":        "KovZ91778pf",
+
   // Birmingham
   "Aston Villa":              "KovZ9177z9c",
   "Birmingham City":          "KovZ9177z9B",
@@ -47,6 +49,13 @@ export const homeGrounds = {
   "Celtic":                   "KovZ9177z9r",
   "Rangers":                  "KovZ9177z9t",
 
+  // Edinburgh
+  "Heart of Midlothian":      "KovZ9177PeV",
+  "Hibernian":                "KovZ9177wlf",
+
   // Cardiff
   "Cardiff City":             "KovZ9177z9A",
+
+  // Belfast
+  "Linfield":                 "KovZ917AAv0",
 };

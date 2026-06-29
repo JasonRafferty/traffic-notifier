@@ -16,3 +16,30 @@ export const footballClubIdsByCity = {
   Cardiff: ["133637"],
   Belfast: ["133964"],
 };
+
+export const footballHomeTeamsByCity = {
+  Manchester: ["Manchester United", "Manchester City"],
+  London: [
+    "Arsenal",
+    "Chelsea",
+    "Tottenham Hotspur",
+    "West Ham United",
+    "Crystal Palace",
+    "Fulham",
+    "Charlton Athletic",
+  ],
+  Birmingham: ["Aston Villa", "Birmingham City"],
+  Liverpool: ["Liverpool", "Everton"],
+  Newcastle: ["Newcastle United"],
+  Leeds: ["Leeds United"],
+  Sheffield: ["Sheffield United", "Sheffield Wednesday"],
+  Nottingham: ["Nottingham Forest"],
+  Leicester: ["Leicester City"],
+  Southampton: ["Southampton"],
+  Wolverhampton: ["Wolverhampton Wanderers"],
+  Sunderland: ["Sunderland"],
+  Glasgow: ["Celtic", "Rangers"],
+  Edinburgh: ["Heart of Midlothian", "Hibernian"],
+  Cardiff: ["Cardiff City"],
+  Belfast: ["Linfield"],
+};

@@ -1,9 +1,9 @@
-import { parseTimeString } from "../utils/timeUtils.js";
+import { formatLocalDateInputValue, parseTimeString } from "../utils/timeUtils.js";
 
 export function setupControls(onSearch) {
   const dateInput = document.getElementById("dateInput");
   const timeInput = document.getElementById("timeInput");
-  const today = new Date().toISOString().split("T")[0];
+  const today = formatLocalDateInputValue(new Date());
   dateInput.value = today;
 
   setupDateChips(dateInput, today);
@@ -84,7 +84,7 @@ function setupTimeChips(timeInput) {
 function offsetDate(days) {
   const d = new Date();
   d.setDate(d.getDate() + days);
-  return d.toISOString().split("T")[0];
+  return formatLocalDateInputValue(d);
 }
 
 function nextWeekday(targetDay) {
@@ -92,5 +92,5 @@ function nextWeekday(targetDay) {
   const diff = (targetDay - now.getDay() + 7) % 7;
   const d = new Date();
   d.setDate(now.getDate() + diff);
-  return d.toISOString().split("T")[0];
+  return formatLocalDateInputValue(d);
 }

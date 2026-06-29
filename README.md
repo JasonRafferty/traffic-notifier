@@ -12,17 +12,17 @@ Large events — Premier League matches, concerts, rugby internationals — can 
 2. Optionally set a time to filter events to only those happening around when you plan to drive
 3. Hit Search — the app queries two APIs in parallel:
    - **Ticketmaster** — concerts, theatre, sport, and other ticketed events
-   - **TheSportsDB** — football fixtures (currently Arsenal; expanding to full city → club mapping)
+   - **TheSportsDB** — football fixtures for supported clubs in the selected city
 4. Results are sorted by venue capacity (largest first) and capped at the top 5
 5. Each result shows: venue name, date, start time, estimated end time, and capacity
 
 ---
 
-## Planned Features
+## Core Features
 
 ### Red / Amber / Green Traffic Verdict
 
-The core improvement. Instead of just listing events, the app will show a top-level verdict:
+The app shows a top-level verdict before the event list:
 
 | Colour | Meaning | Trigger |
 |--------|---------|---------|
@@ -40,12 +40,12 @@ The app already supports optional time filtering (only show events within ±1 ho
 
 ### City Dropdown + City → Club Mapping
 
-The city input will become a dropdown of supported cities. This solves two problems:
+The city input is a dropdown of supported cities. This solves two problems:
 
 1. Prevents silent failures when a city name doesn't match the football club lookup
 2. Makes it clear upfront which cities the app covers
 
-Each city in the dropdown will map to its relevant football clubs in TheSportsDB, so fixture data is fetched for the right teams — not just Arsenal. For example:
+Each city maps to its relevant football clubs in TheSportsDB. The app fetches upcoming fixtures for those teams, then keeps only fixtures where the home team belongs to the selected city. That prevents away games from polluting the wrong traffic result.
 
 | City | Clubs |
 |------|-------|
@@ -58,11 +58,13 @@ Each city in the dropdown will map to its relevant football clubs in TheSportsDB
 | Nottingham | Nottingham Forest |
 | Leicester | Leicester City |
 | Glasgow | Celtic, Rangers |
+| Edinburgh | Hearts, Hibernian |
 | Cardiff | Cardiff City |
 | Southampton | Southampton |
 | Sheffield | Sheffield United, Sheffield Wednesday |
 | Sunderland | Sunderland |
 | Wolverhampton | Wolves |
+| Belfast | Linfield |
 
 ---
 
@@ -75,7 +77,7 @@ traffic-notifier/
 │   ├── js/
 │   │   ├── app.js          # Entry point — coordinates controls, fetches, scoring, rendering
 │   │   ├── api/            # Ticketmaster and TheSportsDB fetchers
-│   │   ├── data/           # City, venue, alias, and rush-hour profile data
+│   │   ├── data/           # City, venue, home-ground, and rush-hour profile data
 │   │   ├── events/         # Event normalisation, deduping, and time-window logic
 │   │   ├── traffic/        # Baseline traffic and verdict scoring
 │   │   ├── ui/             # Controls, loading, verdict, and event renderers
@@ -87,7 +89,29 @@ traffic-notifier/
 
 ### Key Design Decisions
 
-**data/venueCapacities.js** — Ticketmaster uses internal venue IDs (e.g. `KovZ9177z3V` = Old Trafford). The venues map translates these to human-readable names, capacities, and sport types. This is used both for display and for estimating event duration when the API doesn't provide an end time:
+**data/venueCapacities.js** — Ticketmaster uses internal venue IDs (e.g. `KovZ9177z3V` = Old Trafford). The venues map translates those IDs to a display name and an estimated capacity:
+
+```js
+KovZ9177z3V: { capacity: 74310, location: "Old Trafford" }
+```
+
+The capacity is used for the traffic score and for sorting the event list. The location is used when the app normalises football fixtures from TheSportsDB into the same shape as Ticketmaster events.
+
+**data/homeGrounds.js** — TheSportsDB football fixtures tell us the home team. Instead of fuzzy-matching a venue name string, the app maps the home team directly to the Ticketmaster venue ID:
+
+```js
+"Manchester United": "KovZ9177z3V"
+```
+
+This makes football capacity scoring more reliable, because a home fixture resolves to the same venue ID used everywhere else in the app.
+
+**Event classifications** — Event duration is estimated from `event.classifications`, not from the static venue data. Ticketmaster already returns classifications, and TheSportsDB football matches are normalised with:
+
+```js
+classifications: [{ segment: { name: "Sports" }, genre: { name: "Football" } }]
+```
+
+When an event has no explicit end time, the fallback durations are:
 
 | Sport type | Estimated duration |
 |---|---|
@@ -107,6 +131,7 @@ traffic-notifier/
 ### Ticketmaster Discovery API
 - Endpoint: `https://app.ticketmaster.com/discovery/v2/events.json`
 - Filters by city and date range (full day: 00:00:00Z to 23:59:59Z)
+- Fetches every available page for that city/date, using the maximum page size
 - Returns events with venue IDs, start/end times, and embedded venue data
 - Docs: https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/
 
@@ -114,6 +139,7 @@ traffic-notifier/
 - Endpoint: `https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=TEAM_ID`
 - Free tier (API v1) — no key required
 - Returns upcoming fixtures for a given team ID
+- The app filters those fixtures by selected date and selected city's home teams
 - Docs: https://www.thesportsdb.com/docs_api_examples
 - City-to-club mappings live in `src/js/data/footballClubs.js`
 
@@ -135,6 +161,14 @@ VITE_TICKETMASTER_API_KEY=your_ticketmaster_api_key_here
 ```
 
 > Note: Vite exposes `VITE_` variables to the browser bundle. This is fine for public browser keys, but a private key should be protected behind a proxy backend.
+
+To check whether Ticketmaster is returning venue IDs that are missing from the local capacity table, run:
+
+```bash
+npm run update-venues
+```
+
+The script checks the supported cities, walks every Ticketmaster result page, and prints unknown venues in a paste-ready format for `src/js/data/venueCapacities.js`.
 
 ## Deployment
 
@@ -158,4 +192,4 @@ The app has hardcoded capacity data for major UK venues across:
 
 **Northern Ireland:** Belfast
 
-Venues without a matching entry in `data/venueCapacities.js` will still appear in results but will show "Unknown" capacity and fall back to a 3-hour duration estimate.
+Venues without a matching entry in `data/venueCapacities.js` can still appear in results, but they will not contribute capacity to the traffic score until they are added. Event duration still comes from the event classification when available; if an event has no useful classification and no end time, it falls back to the generic 3-hour estimate.

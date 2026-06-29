@@ -49,7 +49,7 @@ export function normaliseFootballMatch(match) {
       venues: [
         {
           id: venueId || fallbackVenueId,
-          name: venueId ? venueCapacities[venueId].location : venueName,
+          name: venueId ? venueCapacities[venueId]?.location || venueName : venueName,
         },
       ],
     },

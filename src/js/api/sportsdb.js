@@ -1,4 +1,4 @@
-import { footballClubIdsByCity } from "../data/footballClubs.js";
+import { footballClubIdsByCity, footballHomeTeamsByCity } from "../data/footballClubs.js";
 import { dedupeEvents } from "../events/dedupeEvents.js";
 import { normaliseFootballMatch } from "../events/normaliseEvent.js";
 
@@ -26,16 +26,22 @@ export async function fetchFootballMatches(city, dateInput) {
     .filter((result) => result.status === "rejected")
     .forEach((result) => console.error("Unable to fetch football fixtures:", result.reason));
 
-  const matchesOnSelectedDate = fixtures.filter((match) => match.dateEvent === dateInput);
+  const homeTeams = new Set(footballHomeTeamsByCity[city] || []);
+  const matchesOnSelectedDate = fixtures.filter((match) => {
+    return match.dateEvent === dateInput && homeTeams.has(match.strHomeTeam);
+  });
+
   if (import.meta.env.DEV) {
     console.info("[SportsDB] football fixtures", {
       city,
       selectedDate: dateInput,
+      homeTeams: [...homeTeams],
       fetched: fixtures.map((match) => ({
         event: match.strEvent,
         date: match.dateEvent,
         time: match.strTime,
         venue: match.strVenue,
+        homeTeam: match.strHomeTeam,
       })),
       matchingSelectedDate: matchesOnSelectedDate.length,
     });

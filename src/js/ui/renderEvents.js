@@ -1,5 +1,6 @@
 import { createIcons, Clock, MapPin, Users } from "lucide";
 import { venueCapacities } from "../data/venueCapacities.js";
+import { formatLocalDateInputValue } from "../utils/timeUtils.js";
 
 let clickHandlerAttached = false;
 
@@ -27,7 +28,7 @@ export function renderEmptyState(container, currentDate) {
     const nd = new Date(d);
     nd.setDate(d.getDate() + offset);
     return {
-      value: nd.toISOString().split("T")[0],
+      value: formatLocalDateInputValue(nd),
       label: `${dayNames[nd.getDay()]} ${nd.getDate()} ${monthNames[nd.getMonth()]}`,
     };
   });
