@@ -10,8 +10,6 @@ export const homeGrounds = {
   "West Ham United":          "KovZ9177z6g",
   "Crystal Palace":           "KovZ9177z5X",
   "Fulham":                   "KovZ9177z4X",
-  "Queens Park Rangers":      "KovZ9177z8p",
-
   // Birmingham
   "Aston Villa":              "KovZ9177z9c",
   "Birmingham City":          "KovZ9177z9B",

@@ -27,5 +27,19 @@ export async function fetchFootballMatches(city, dateInput) {
     .forEach((result) => console.error("Unable to fetch football fixtures:", result.reason));
 
   const matchesOnSelectedDate = fixtures.filter((match) => match.dateEvent === dateInput);
+  if (import.meta.env.DEV) {
+    console.info("[SportsDB] football fixtures", {
+      city,
+      selectedDate: dateInput,
+      fetched: fixtures.map((match) => ({
+        event: match.strEvent,
+        date: match.dateEvent,
+        time: match.strTime,
+        venue: match.strVenue,
+      })),
+      matchingSelectedDate: matchesOnSelectedDate.length,
+    });
+  }
+
   return dedupeEvents(matchesOnSelectedDate.map(normaliseFootballMatch).filter(Boolean));
 }

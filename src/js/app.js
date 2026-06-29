@@ -57,9 +57,8 @@ function displayResults({ events, userTimeInMins, date, city }) {
   }
 
   const hasTimeFilter = typeof userTimeInMins === "number";
-  const matchingEvents = events
-    .map(addComputedEventWindow)
-    .filter((event) => overlapsUserTime(event, userTimeInMins));
+  const computedEvents = events.map(addComputedEventWindow);
+  const matchingEvents = computedEvents.filter((event) => overlapsUserTime(event, userTimeInMins));
 
   renderVerdict(scoreTraffic(
     matchingEvents,
@@ -67,18 +66,20 @@ function displayResults({ events, userTimeInMins, date, city }) {
     hasTimeFilter ? "No events overlap with your chosen time" : "No major events found today"
   ));
 
-  const items = [...matchingEvents]
-    .sort((a, b) => {
-      const capA = venueCapacities[a._embedded?.venues?.[0]?.id]?.capacity || 0;
-      const capB = venueCapacities[b._embedded?.venues?.[0]?.id]?.capacity || 0;
-      return capB - capA;
-    })
-    .slice(0, venuesShown);
+  const items = sortByCapacity(matchingEvents).slice(0, venuesShown);
 
   if (items.length === 0) {
-    renderNoTimeMatches(eventsContainer);
+    renderNoTimeMatches(eventsContainer, hasTimeFilter ? sortByCapacity(computedEvents).slice(0, venuesShown) : []);
     return;
   }
 
   renderEvents(eventsContainer, items);
+}
+
+function sortByCapacity(events) {
+  return [...events].sort((a, b) => {
+    const capA = venueCapacities[a._embedded?.venues?.[0]?.id]?.capacity || 0;
+    const capB = venueCapacities[b._embedded?.venues?.[0]?.id]?.capacity || 0;
+    return capB - capA;
+  });
 }
