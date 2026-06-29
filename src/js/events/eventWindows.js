@@ -1,25 +1,28 @@
 import { venueCapacities } from "../data/venueCapacities.js";
 import { parseTimeString } from "../utils/timeUtils.js";
 
+function getEventDurationMins(event) {
+  const genre = (event.classifications?.[0]?.genre?.name ?? "").toLowerCase();
+  const segment = (event.classifications?.[0]?.segment?.name ?? "").toLowerCase();
+
+  if (genre.includes("soccer") || genre.includes("football") || genre.includes("rugby")) return 120;
+  if (genre.includes("cricket")) return 180;
+  if (genre.includes("hockey")) return 150;
+  if (segment === "sports") return 120;
+  return 180;
+}
+
 export function addComputedEventWindow(event) {
   const startTimeStr = event.dates?.start?.localTime || "00:00:00";
   const startTimeInMins = parseTimeString(startTimeStr.slice(0, 5));
   const venueId = event._embedded?.venues?.[0]?.id;
   const venueDetails = venueCapacities[venueId];
 
-  let endTimeInMins;
   const endTimeStr = event.dates?.end?.localTime;
-  if (endTimeStr && endTimeStr !== "00:00:00") {
-    endTimeInMins = parseTimeString(endTimeStr.slice(0, 5));
-  } else if (venueDetails?.type === "football" || venueDetails?.type === "rugby") {
-    endTimeInMins = startTimeInMins + 120;
-  } else if (venueDetails?.type === "cricket") {
-    endTimeInMins = startTimeInMins + 180;
-  } else if (venueDetails?.type === "hockey") {
-    endTimeInMins = startTimeInMins + 150;
-  } else {
-    endTimeInMins = startTimeInMins + 180;
-  }
+  const endTimeInMins =
+    endTimeStr && endTimeStr !== "00:00:00"
+      ? parseTimeString(endTimeStr.slice(0, 5))
+      : startTimeInMins + getEventDurationMins(event);
 
   return {
     ...event,
