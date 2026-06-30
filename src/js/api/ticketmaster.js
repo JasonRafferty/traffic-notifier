@@ -1,10 +1,20 @@
 const ticketmasterApiKey = import.meta.env.VITE_TICKETMASTER_API_KEY;
 const pageSize = "200";
+const countryCode = "GB";
+
+function success(events) {
+  return { events, status: "success", source: "Ticketmaster" };
+}
+
+function unavailable(message) {
+  return { events: [], status: "error", source: "Ticketmaster", message };
+}
 
 export async function fetchTicketmasterEvents(city, dateInput) {
   if (!ticketmasterApiKey) {
-    console.error("Missing VITE_TICKETMASTER_API_KEY. Ticketmaster events will not load.");
-    return [];
+    const message = "Missing Ticketmaster API key. Ticketmaster events will not load.";
+    console.error(message);
+    return unavailable(message);
   }
 
   const startDateTime = `${dateInput}T00:00:00Z`;
@@ -12,6 +22,7 @@ export async function fetchTicketmasterEvents(city, dateInput) {
   const params = new URLSearchParams({
     apikey: ticketmasterApiKey,
     city,
+    countryCode,
     startDateTime,
     endDateTime,
     size: pageSize,
@@ -33,11 +44,11 @@ export async function fetchTicketmasterEvents(city, dateInput) {
       currentPage += 1;
     }
 
-    return events.filter((event) => {
+    return success(events.filter((event) => {
       return event.dates?.start?.localDate === dateInput;
-    });
+    }));
   } catch (error) {
     console.error("Error fetching Ticketmaster events:", error);
-    return [];
+    return unavailable("Ticketmaster events could not be loaded.");
   }
 }

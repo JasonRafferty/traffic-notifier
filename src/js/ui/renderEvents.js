@@ -58,6 +58,20 @@ export function renderEmptyState(container, currentDate) {
   });
 }
 
+export function renderProviderIssueState(container, providerStatuses = []) {
+  const issues = providerStatuses.filter((provider) => provider?.status && provider.status !== "success");
+  const issueLines = issues.map((provider) => {
+    return escapeHtml(provider.message || `${provider.source || "A data source"} could not be loaded.`);
+  });
+
+  container.innerHTML = `
+    <div class="space-y-2">
+      <p class="text-amber-300/80 text-sm">Could not fully check events for this search.</p>
+      ${issueLines.map((line) => `<p class="text-slate-500 text-xs">${line}</p>`).join("")}
+      <p class="text-slate-600 text-xs">Try again shortly, or check a nearby date.</p>
+    </div>`;
+}
+
 export function renderNoTimeMatches(container, eventsOutsideTime = []) {
   container.innerHTML = `
     <div class="space-y-2">

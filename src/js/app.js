@@ -6,7 +6,13 @@ import { getBaselineTraffic } from "./traffic/baselineTraffic.js";
 import { scoreTraffic } from "./traffic/scoreTraffic.js";
 import { getSearchInputs, setupControls } from "./ui/controls.js";
 import { showLoading } from "./ui/loading.js";
-import { renderEmptyState, renderEvents, renderNoTimeMatches, showEventsSection } from "./ui/renderEvents.js";
+import {
+  renderEmptyState,
+  renderEvents,
+  renderNoTimeMatches,
+  renderProviderIssueState,
+  showEventsSection,
+} from "./ui/renderEvents.js";
 import { renderVerdict } from "./ui/renderVerdict.js";
 import { venueCapacities } from "./data/venueCapacities.js";
 
@@ -30,20 +36,21 @@ async function handleSearchButton() {
 
   showLoading();
 
-  const [ticketmasterEvents, footballMatches] = await Promise.all([
+  const [ticketmasterResult, footballResult] = await Promise.all([
     fetchTicketmasterEvents(city, date),
     fetchFootballMatches(city, date),
   ]);
 
   displayResults({
-    events: dedupeEvents([...ticketmasterEvents, ...footballMatches]),
+    events: dedupeEvents([...ticketmasterResult.events, ...footballResult.events]),
+    providerStatuses: [ticketmasterResult, footballResult],
     userTimeInMins,
     date,
     city,
   });
 }
 
-function displayResults({ events, userTimeInMins, date, city }) {
+function displayResults({ events, providerStatuses, userTimeInMins, date, city }) {
   const eventsContainer = document.getElementById("events");
   showEventsSection();
   eventsContainer.innerHTML = "";
@@ -51,7 +58,11 @@ function displayResults({ events, userTimeInMins, date, city }) {
   const baselineTraffic = getBaselineTraffic(city, date, userTimeInMins);
 
   if (!events || events.length === 0) {
-    renderVerdict(scoreTraffic([], baselineTraffic));
+    renderVerdict(scoreTraffic([], baselineTraffic, "No major events found today", providerStatuses));
+    if (hasProviderIssue(providerStatuses)) {
+      renderProviderIssueState(eventsContainer, providerStatuses);
+      return;
+    }
     renderEmptyState(eventsContainer, date);
     return;
   }
@@ -63,7 +74,8 @@ function displayResults({ events, userTimeInMins, date, city }) {
   renderVerdict(scoreTraffic(
     matchingEvents,
     baselineTraffic,
-    hasTimeFilter ? "No events overlap with your chosen time" : "No major events found today"
+    hasTimeFilter ? "No events overlap with your chosen time" : "No major events found today",
+    providerStatuses
   ));
 
   const items = sortByCapacity(matchingEvents).slice(0, venuesShown);
@@ -82,4 +94,8 @@ function sortByCapacity(events) {
     const capB = venueCapacities[b._embedded?.venues?.[0]?.id]?.capacity || 0;
     return capB - capA;
   });
+}
+
+function hasProviderIssue(providerStatuses = []) {
+  return providerStatuses.some((provider) => provider?.status && provider.status !== "success");
 }

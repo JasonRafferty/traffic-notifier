@@ -2,13 +2,21 @@ export function renderVerdict(verdict) {
   const verdictEl = document.getElementById("verdict");
   if (!verdictEl) return;
 
-  const { level, headline, sub, count, eventCapacity, baselineTraffic } = verdict;
-  const eventLine = eventCapacity > 0
-    ? `${count} event${count !== 1 ? "s" : ""} - ~${eventCapacity.toLocaleString()} people expected`
+  const { level, headline, sub, count, eventCapacity, baselineTraffic, dataQuality } = verdict;
+  const unknownCapacityCount = dataQuality?.unknownCapacityCount || 0;
+  const providerIssues = dataQuality?.providerIssues || [];
+  const eventLine = count > 0
+    ? `${count} event${count !== 1 ? "s" : ""} - ${eventCapacity > 0 ? `~${eventCapacity.toLocaleString()} people counted` : "capacity unknown"}`
     : "";
   const baselineLine = baselineTraffic?.impact > 0
     ? `${baselineTraffic.label} - ${baselineTraffic.city} baseline traffic`
     : "";
+  const capacityLine = unknownCapacityCount > 0
+    ? `${unknownCapacityCount} event${unknownCapacityCount !== 1 ? "s" : ""} missing capacity - verdict may understate traffic`
+    : "";
+  const providerLines = providerIssues.map((provider) => {
+    return provider.message || `${provider.source || "A data source"} could not be loaded.`;
+  });
 
   const dot = (hex, glowHex, active) => `
     <div class="relative w-3 h-3 shrink-0">
@@ -27,9 +35,23 @@ export function renderVerdict(verdict) {
       </div>
       <div>
         <p class="font-display font-bold text-2xl text-white uppercase tracking-wide leading-none">${headline}</p>
-        <p class="text-slate-400 text-xs mt-1">${sub}</p>
-        ${eventLine ? `<p class="text-slate-600 text-xs mt-0.5">${eventLine}</p>` : ""}
-        ${baselineLine ? `<p class="text-slate-600 text-xs mt-0.5">${baselineLine}</p>` : ""}
+        <p class="text-slate-400 text-xs mt-1">${escapeHtml(sub)}</p>
+        ${eventLine ? `<p class="text-slate-600 text-xs mt-0.5">${escapeHtml(eventLine)}</p>` : ""}
+        ${baselineLine ? `<p class="text-slate-600 text-xs mt-0.5">${escapeHtml(baselineLine)}</p>` : ""}
+        ${capacityLine ? `<p class="text-amber-300/80 text-xs mt-0.5">${escapeHtml(capacityLine)}</p>` : ""}
+        ${providerLines.map((line) => `
+          <p class="text-amber-300/80 text-xs mt-0.5">${escapeHtml(line)}</p>
+        `).join("")}
       </div>
     </div>`;
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[char]));
 }

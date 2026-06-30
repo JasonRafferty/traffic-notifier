@@ -2,9 +2,13 @@ import { footballClubIdsByCity, footballHomeTeamsByCity } from "../data/football
 import { dedupeEvents } from "../events/dedupeEvents.js";
 import { normaliseFootballMatch } from "../events/normaliseEvent.js";
 
+function result(events, status = "success", message = "") {
+  return { events, status, source: "TheSportsDB", message };
+}
+
 export async function fetchFootballMatches(city, dateInput) {
   const clubIds = footballClubIdsByCity[city] || [];
-  if (clubIds.length === 0) return [];
+  if (clubIds.length === 0) return result([]);
 
   const fixtureRequests = clubIds.map(async (clubId) => {
     const response = await fetch(`https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=${clubId}`);
@@ -47,5 +51,13 @@ export async function fetchFootballMatches(city, dateInput) {
     });
   }
 
-  return dedupeEvents(matchesOnSelectedDate.map(normaliseFootballMatch).filter(Boolean));
+  const events = dedupeEvents(matchesOnSelectedDate.map(normaliseFootballMatch).filter(Boolean));
+  const failedCount = results.filter((result) => result.status === "rejected").length;
+
+  if (failedCount === 0) return result(events);
+  if (failedCount === results.length) {
+    return result([], "error", "Football fixtures could not be loaded.");
+  }
+
+  return result(events, "partial", "Some football fixtures could not be loaded.");
 }

@@ -1,6 +1,11 @@
 import { venueCapacities } from "../data/venueCapacities.js";
 
-export function scoreTraffic(events, baselineTraffic = { impact: 0 }, emptySub = "No major events found today") {
+export function scoreTraffic(
+  events,
+  baselineTraffic = { impact: 0 },
+  emptySub = "No major events found today",
+  providerStatuses = []
+) {
   const eventCapacity = (events || []).reduce((sum, event) => {
     const venueId = event._embedded?.venues?.[0]?.id;
     return sum + (venueCapacities[venueId]?.capacity || 0);
@@ -8,6 +13,29 @@ export function scoreTraffic(events, baselineTraffic = { impact: 0 }, emptySub =
   const baselineImpact = baselineTraffic?.impact || 0;
   const totalRisk = eventCapacity + baselineImpact;
   const count = events?.length || 0;
+  const unknownCapacityCount = (events || []).filter((event) => {
+    const venueId = event._embedded?.venues?.[0]?.id;
+    return !venueCapacities[venueId]?.capacity;
+  }).length;
+  const providerIssues = (providerStatuses || []).filter((provider) => {
+    return provider?.status && provider.status !== "success";
+  });
+  const dataQuality = {
+    unknownCapacityCount,
+    providerIssues,
+  };
+
+  if (totalRisk === 0 && (count > 0 || providerIssues.length > 0)) {
+    return {
+      level: "amber",
+      headline: "Traffic Risk Unclear",
+      sub: count > 0 ? "Events found, but capacity data is missing" : "Some event data could not be checked",
+      count,
+      eventCapacity,
+      baselineTraffic,
+      dataQuality,
+    };
+  }
 
   if (totalRisk === 0) {
     return {
@@ -17,6 +45,7 @@ export function scoreTraffic(events, baselineTraffic = { impact: 0 }, emptySub =
       count,
       eventCapacity,
       baselineTraffic,
+      dataQuality,
     };
   }
 
@@ -28,6 +57,7 @@ export function scoreTraffic(events, baselineTraffic = { impact: 0 }, emptySub =
       count,
       eventCapacity,
       baselineTraffic,
+      dataQuality,
     };
   }
 
@@ -39,6 +69,7 @@ export function scoreTraffic(events, baselineTraffic = { impact: 0 }, emptySub =
       count,
       eventCapacity,
       baselineTraffic,
+      dataQuality,
     };
   }
 
@@ -49,5 +80,6 @@ export function scoreTraffic(events, baselineTraffic = { impact: 0 }, emptySub =
     count,
     eventCapacity,
     baselineTraffic,
+    dataQuality,
   };
 }
