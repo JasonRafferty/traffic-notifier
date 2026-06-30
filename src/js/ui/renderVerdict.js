@@ -4,15 +4,19 @@ export function renderVerdict(verdict) {
 
   const { level, headline, sub, count, eventCapacity, baselineTraffic, dataQuality } = verdict;
   const unknownCapacityCount = dataQuality?.unknownCapacityCount || 0;
+  const ignoredUnknownCapacityCount = dataQuality?.ignoredUnknownCapacityCount || 0;
   const providerIssues = dataQuality?.providerIssues || [];
   const eventLine = count > 0
-    ? `${count} event${count !== 1 ? "s" : ""} - ${eventCapacity > 0 ? `~${eventCapacity.toLocaleString()} people counted` : "capacity unknown"}`
+    ? buildEventLine(count, eventCapacity, unknownCapacityCount)
     : "";
   const baselineLine = baselineTraffic?.impact > 0
     ? `${baselineTraffic.label} - ${baselineTraffic.city} baseline traffic`
     : "";
   const capacityLine = unknownCapacityCount > 0
-    ? `${unknownCapacityCount} event${unknownCapacityCount !== 1 ? "s" : ""} missing capacity - verdict may understate traffic`
+    ? `${unknownCapacityCount} traffic-relevant event${unknownCapacityCount !== 1 ? "s" : ""} missing capacity - verdict may understate traffic`
+    : "";
+  const ignoredCapacityLine = ignoredUnknownCapacityCount > 0
+    ? `${ignoredUnknownCapacityCount} smaller event${ignoredUnknownCapacityCount !== 1 ? "s" : ""} with unknown capacity treated as low impact`
     : "";
   const providerLines = providerIssues.map((provider) => {
     return provider.message || `${provider.source || "A data source"} could not be loaded.`;
@@ -21,6 +25,7 @@ export function renderVerdict(verdict) {
     eventLine,
     baselineLine,
     capacityLine,
+    ignoredCapacityLine,
     ...providerLines,
   ].filter(Boolean);
 
@@ -56,6 +61,13 @@ export function renderVerdict(verdict) {
         </div>
       </div>
     </div>`;
+}
+
+function buildEventLine(count, eventCapacity, unknownCapacityCount) {
+  const label = `${count} event${count !== 1 ? "s" : ""}`;
+  if (eventCapacity > 0) return `${label} - ~${eventCapacity.toLocaleString()} people counted`;
+  if (unknownCapacityCount > 0) return `${label} - capacity unknown`;
+  return `${label} - no major venue capacity counted`;
 }
 
 function escapeHtml(value) {
