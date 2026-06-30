@@ -51,14 +51,19 @@ export function renderVerdict(verdict) {
       <div>
         <p class="font-display font-bold text-2xl text-white uppercase tracking-wide leading-none">${headline}</p>
         <p class="text-slate-400 text-xs mt-1">${escapeHtml(sub)}</p>
-        <div class="mt-3 rounded-lg border border-[#1E2D45] bg-[#0D1526] px-3 py-2">
-          <p class="font-display text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5">Why this verdict</p>
-          <div class="space-y-1">
+        <details class="why-verdict mt-3 rounded-lg border border-[#1E2D45] bg-[#0D1526]">
+          <summary class="flex items-center justify-between px-3 py-2 cursor-pointer select-none">
+            <span class="font-display text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Why this verdict</span>
+            <svg class="why-verdict-chevron w-3 h-3 text-slate-500 shrink-0 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="space-y-1 px-3 pb-2">
             ${explanationLines.map((line) => `
               <p class="text-slate-400 text-xs">${escapeHtml(line)}</p>
             `).join("")}
           </div>
-        </div>
+        </details>
       </div>
     </div>`;
 }

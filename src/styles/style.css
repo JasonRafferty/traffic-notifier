@@ -52,6 +52,17 @@ input[type="time"] {
   color: white;
 }
 
+/* "Why this verdict" disclosure */
+.why-verdict summary {
+  list-style: none;
+}
+.why-verdict summary::-webkit-details-marker {
+  display: none;
+}
+.why-verdict[open] .why-verdict-chevron {
+  transform: rotate(180deg);
+}
+
 /* Fade + slide up for results */
 .fade-in {
   animation: fadeSlideIn 0.35s ease forwards;
