@@ -17,6 +17,16 @@ export function renderVerdict(verdict) {
   const providerLines = providerIssues.map((provider) => {
     return provider.message || `${provider.source || "A data source"} could not be loaded.`;
   });
+  const explanationLines = [
+    eventLine,
+    baselineLine,
+    capacityLine,
+    ...providerLines,
+  ].filter(Boolean);
+
+  if (explanationLines.length === 0) {
+    explanationLines.push("No matching major events or rush-hour pressure found for this search.");
+  }
 
   const dot = (hex, glowHex, active) => `
     <div class="relative w-3 h-3 shrink-0">
@@ -36,12 +46,14 @@ export function renderVerdict(verdict) {
       <div>
         <p class="font-display font-bold text-2xl text-white uppercase tracking-wide leading-none">${headline}</p>
         <p class="text-slate-400 text-xs mt-1">${escapeHtml(sub)}</p>
-        ${eventLine ? `<p class="text-slate-600 text-xs mt-0.5">${escapeHtml(eventLine)}</p>` : ""}
-        ${baselineLine ? `<p class="text-slate-600 text-xs mt-0.5">${escapeHtml(baselineLine)}</p>` : ""}
-        ${capacityLine ? `<p class="text-amber-300/80 text-xs mt-0.5">${escapeHtml(capacityLine)}</p>` : ""}
-        ${providerLines.map((line) => `
-          <p class="text-amber-300/80 text-xs mt-0.5">${escapeHtml(line)}</p>
-        `).join("")}
+        <div class="mt-3 rounded-lg border border-[#1E2D45] bg-[#0D1526] px-3 py-2">
+          <p class="font-display text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5">Why this verdict</p>
+          <div class="space-y-1">
+            ${explanationLines.map((line) => `
+              <p class="text-slate-400 text-xs">${escapeHtml(line)}</p>
+            `).join("")}
+          </div>
+        </div>
       </div>
     </div>`;
 }

@@ -111,7 +111,7 @@ function renderEventList(items) {
 
   return `<div class="divide-y divide-[#1E2D45]">
     ${items.map((event) => {
-      const { startTimeStr, endTimeInMins, venueDetails } = event._computed;
+      const { startTimeStr, endTimeInMins, hasKnownStartTime } = event._computed;
       const venueName = escapeHtml(event._embedded?.venues?.[0]?.name || "Unknown Venue");
       const eventName = escapeHtml(event.name || "");
       const venueId = event._embedded?.venues?.[0]?.id;
@@ -123,8 +123,8 @@ function renderEventList(items) {
 
       const endH = Math.floor(endTimeInMins / 60).toString().padStart(2, "0");
       const endM = (endTimeInMins % 60).toString().padStart(2, "0");
-      const startDisplay = startTimeStr !== "00:00:00" ? startTimeStr.slice(0, 5) : "TBA";
-      const endDisplay = `${endH}:${endM}`;
+      const startDisplay = hasKnownStartTime ? startTimeStr.slice(0, 5) : "Time TBA";
+      const endDisplay = hasKnownStartTime ? ` - ${endH}:${endM}` : "";
 
       shownCount++;
       return `
@@ -148,7 +148,7 @@ function renderEventList(items) {
           <div class="flex gap-5 ml-5 text-xs text-slate-500">
             <span class="flex items-center gap-1.5">
               <i data-lucide="clock" class="w-3 h-3 shrink-0"></i>
-              ${startDisplay} - ${endDisplay}
+              ${startDisplay}${endDisplay}
             </span>
             ${capacity ? `
             <span class="flex items-center gap-1.5">

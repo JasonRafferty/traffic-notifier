@@ -24,6 +24,17 @@ export function getSearchInputs() {
   };
 }
 
+export function setSearchLoading(isLoading) {
+  const button = document.getElementById("inputButton");
+  if (!button) return;
+
+  button.disabled = isLoading;
+  button.textContent = isLoading ? "Searching..." : "Search";
+  button.classList.toggle("opacity-70", isLoading);
+  button.classList.toggle("cursor-wait", isLoading);
+  button.classList.toggle("cursor-pointer", !isLoading);
+}
+
 function setupDateChips(dateInput, today) {
   const chipDates = {
     today,

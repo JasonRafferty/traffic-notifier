@@ -4,7 +4,7 @@ import { dedupeEvents } from "./events/dedupeEvents.js";
 import { addComputedEventWindow, overlapsUserTime } from "./events/eventWindows.js";
 import { getBaselineTraffic } from "./traffic/baselineTraffic.js";
 import { scoreTraffic } from "./traffic/scoreTraffic.js";
-import { getSearchInputs, setupControls } from "./ui/controls.js";
+import { getSearchInputs, setSearchLoading, setupControls } from "./ui/controls.js";
 import { showLoading } from "./ui/loading.js";
 import {
   renderEmptyState,
@@ -34,20 +34,25 @@ async function handleSearchButton() {
     return;
   }
 
+  setSearchLoading(true);
   showLoading();
 
-  const [ticketmasterResult, footballResult] = await Promise.all([
-    fetchTicketmasterEvents(city, date),
-    fetchFootballMatches(city, date),
-  ]);
+  try {
+    const [ticketmasterResult, footballResult] = await Promise.all([
+      fetchTicketmasterEvents(city, date),
+      fetchFootballMatches(city, date),
+    ]);
 
-  displayResults({
-    events: dedupeEvents([...ticketmasterResult.events, ...footballResult.events]),
-    providerStatuses: [ticketmasterResult, footballResult],
-    userTimeInMins,
-    date,
-    city,
-  });
+    displayResults({
+      events: dedupeEvents([...ticketmasterResult.events, ...footballResult.events]),
+      providerStatuses: [ticketmasterResult, footballResult],
+      userTimeInMins,
+      date,
+      city,
+    });
+  } finally {
+    setSearchLoading(false);
+  }
 }
 
 function displayResults({ events, providerStatuses, userTimeInMins, date, city }) {

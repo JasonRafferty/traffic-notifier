@@ -13,20 +13,25 @@ function getEventDurationMins(event) {
 }
 
 export function addComputedEventWindow(event) {
-  const startTimeStr = event.dates?.start?.localTime || "00:00:00";
-  const startTimeInMins = parseTimeString(startTimeStr.slice(0, 5));
+  const rawStartTime = event.dates?.start?.localTime;
+  const hasKnownStartTime = Boolean(rawStartTime && rawStartTime !== "00:00:00");
+  const startTimeStr = hasKnownStartTime ? rawStartTime : "00:00:00";
+  const startTimeInMins = hasKnownStartTime ? parseTimeString(startTimeStr.slice(0, 5)) : 0;
   const venueId = event._embedded?.venues?.[0]?.id;
   const venueDetails = venueCapacities[venueId];
 
   const endTimeStr = event.dates?.end?.localTime;
-  const endTimeInMins =
-    endTimeStr && endTimeStr !== "00:00:00"
+  let endTimeInMins = 23 * 60 + 59;
+
+  if (hasKnownStartTime) {
+    endTimeInMins = endTimeStr && endTimeStr !== "00:00:00"
       ? parseTimeString(endTimeStr.slice(0, 5))
       : startTimeInMins + getEventDurationMins(event);
+  }
 
   return {
     ...event,
-    _computed: { startTimeInMins, endTimeInMins, startTimeStr, venueDetails },
+    _computed: { startTimeInMins, endTimeInMins, startTimeStr, hasKnownStartTime, venueDetails },
   };
 }
 
